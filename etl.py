@@ -25,7 +25,7 @@ api_service_name, api_version, developerKey = DEVELOPER_KEY)
 request = youtube.commentThreads().list(
     part="snippet, replies",
     #parentId="UgzDE2tasfmrYLyNkGt4AaABAg"
-    videoId = "rBIGjWzm1tY"
+    videoId = "ndAQfTzlVjc"
 )
 
 response = request.execute()
@@ -49,6 +49,9 @@ def process_comments(response):
 
 process_comments(response)
 print(comments)
+
+df = pd.DataFrame(comments)
+df.to_csv("comments.csv")
 
 
 
