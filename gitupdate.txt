@@ -3,3 +3,12 @@ sudo apt install python3-pip
 sudo pip install apache-airflow
 sudo pip install pandas
 sudo pip install s3fs
+
+
+-- virtual environment
+python3 -m venv ~/my-venv
+source ~/my-venv/bin/activate
+
+-- airflow credentials
+username: admin
+password: mgXCctEXvaTwYGZM
