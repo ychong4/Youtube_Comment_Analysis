@@ -13,18 +13,13 @@ def run_youtube_etl():
 
 	api_service_name = "youtube"
 	api_version = "v3"
-	DEVELOPER_KEY = "AIzaSyChRV4Vsu1Srvr1JUCYSBqkglXzo13GGds"
+	DEVELOPER_KEY = "--Enter Your Developer Key Here--"
 
 	youtube = googleapiclient.discovery.build(
 	api_service_name, api_version, developerKey = DEVELOPER_KEY)
 
-	#request = youtube.commentThreads().list(
-	#    part="snippet, replies",
-	#    videoId="q8q3OFFfY6c"
-	#)
 	request = youtube.commentThreads().list(
 		part="snippet, replies",
-		#parentId="UgzDE2tasfmrYLyNkGt4AaABAg"
 		videoId = "ndAQfTzlVjc"
 	)
 
@@ -49,3 +44,13 @@ def run_youtube_etl():
 
 
 
+
+
+
+
+
+
+
+
+
+AIzaSyChRV4Vsu1Srvr1JUCYSBqkglXzo13GGds

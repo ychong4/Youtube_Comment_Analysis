@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime
-from etl import run_youtube_etl, process_comments
+from etl import run_youtube_etl
 
 default_args = {
     'owner': 'airflow',
