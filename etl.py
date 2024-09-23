@@ -13,7 +13,7 @@ def run_youtube_etl():
 
 	api_service_name = "youtube"
 	api_version = "v3"
-	DEVELOPER_KEY = "--Enter Your Developer Key Here--"
+	DEVELOPER_KEY = "AIzaSyChRV4Vsu1Srvr1JUCYSBqkglXzo13GGds"
 
 	youtube = googleapiclient.discovery.build(
 	api_service_name, api_version, developerKey = DEVELOPER_KEY)
@@ -53,4 +53,3 @@ def run_youtube_etl():
 
 
 
-AIzaSyChRV4Vsu1Srvr1JUCYSBqkglXzo13GGds
