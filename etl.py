@@ -19,37 +19,38 @@ def run_youtube_etl():
 	youtube = googleapiclient.discovery.build(
 	api_service_name, api_version, developerKey = DEVELOPER_KEY)
 
-	#while True:
+	while True:
 	
-	request = youtube.commentThreads().list(
+		request = youtube.commentThreads().list(
 			part="snippet, replies",
 			videoId = 'D7GDTOSNQSk',
 			#"ndAQfTzlVjc",
-			#pageToken=next_page_token,
+			pageToken=next_page_token,
             maxResults=100	
 		)
 
-	response = request.execute()
-	comments = []
-	items = response.get('items', [])
+		response = request.execute()
+		comments = []
+		items = response.get('items', [])
 		
-	for item in items:
-		author = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
-		comment_text = item['snippet']['topLevelComment']['snippet']['textOriginal']
-		publish_time = item['snippet']['topLevelComment']['snippet']['publishedAt']
-		comment_info = {'author': author, 
+		for item in items:
+			author = item['snippet']['topLevelComment']['snippet']['authorDisplayName']
+			comment_text = item['snippet']['topLevelComment']['snippet']['textOriginal']
+			publish_time = item['snippet']['topLevelComment']['snippet']['publishedAt']
+			comment_info = {'author': author, 
 							'comment': comment_text, 'published_at': publish_time}
 
-		comments.append(comment_info)
+			comments.append(comment_info)
 		#print(comments)
-		#next_page_token = response.get('nextPageToken')
 
-    	#if next_page_token is None:
-        #	break
+		next_page_token = response.get('nextPageToken')
+
+        #if next_page_token is None:
+        #break
 		#print(next_page_token)
 		#print(comments)
-	df = pd.DataFrame(comments)
-	df.to_csv("comments.csv")
+		df = pd.DataFrame(comments)
+		df.to_csv("comments.csv")
 	#s3://myairflowyoutubebucket/
 	print(comments)
 
