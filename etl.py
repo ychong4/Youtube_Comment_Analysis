@@ -3,8 +3,21 @@ import pandas as pd
 import json
 from datetime import datetime
 import s3fs
-
 import googleapiclient.discovery
+
+import re
+import unicodedata
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
+from transformers import pipeline
+import pandas as pd
+# Load model directly
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from pysentimiento import create_analyzer
 
 def run_youtube_etl():
     # Disable OAuthlib's HTTPS verification when running locally.
@@ -70,15 +83,87 @@ def run_youtube_etl():
     df = pd.DataFrame(comments)
     df.to_csv("comments.csv", index=False)
 
-    print(df)
     return comments
 
+def text_cleaning():
+    import nltk
+    # Download NLTK resources
+    nltk.download('stopwords')
+    nltk.download('punkt_tab')
+    nltk.download('wordnet')
+    # Initialize stopwords and lemmatizer
+    stop_words = set(stopwords.words('english'))
+    lemmatizer = WordNetLemmatizer()
 
-	
+    df = pd.read_csv("comments.csv")
 
+    def clean_text(text):
+	    
+        if isinstance(text, str):
+
+            # Normalize the text to remove special encodings
+            text = unicodedata.normalize('NFKD', text)
+
+            # Convert to lowercase
+            text = text.lower()
+
+            # Remove non-ASCII characters
+            text = re.sub(r'[^\x00-\x7F]+', '', text)
+
+            # Remove URLs
+            text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+
+            # Remove HTML tags
+            text = re.sub(r'<.*?>', '', text)
+
+            # Remove punctuation
+            text = re.sub(r'[^\w\s]', '', text)
+
+            # Remove numbers
+            text = re.sub(r'\d+', '', text)
+
+            # Tokenize
+            words = word_tokenize(text)
+
+            # Remove stopwords and lemmatize
+            words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words]
+
+            # Join words back into a single string
+            return ' '.join(words)
+        else:
+            return text
+
+    # Apply text cleaning function to the DataFrame
+    df['cleaned_comment'] = df['comment'].apply(clean_text)
+
+    # Remove rows where 'cleaned_comment' is empty or only whitespace
+    df = df[df['cleaned_comment'].str.strip().astype(bool)]
+
+    # Save to csv format
+    df.to_csv("cleaned_comments.csv")
+
+def sentiment_analysis():
+    analyzer = create_analyzer(task="sentiment", lang="en")
+    pipe = pipeline("text-classification", model="finiteautomata/bertweet-base-sentiment-analysis")
+    tokenizer = AutoTokenizer.from_pretrained("finiteautomata/bertweet-base-sentiment-analysis")
+    model = AutoModelForSequenceClassification.from_pretrained("finiteautomata/bertweet-base-sentiment-analysis")
+
+    def predict_sentiment(text):
+        if isinstance(text, str) and len(text.strip()) > 0:
+            result = analyzer.predict(text)
+            return result.output
+        else:
+            return 'NEU'
+    
+    df = pd.read_csv("cleaned_comments.csv")
+    df['sentiment'] = df['cleaned_comment'].apply(predict_sentiment)
+    df.to_csv("comments_with_sentiment.csv", index=False)
 
 
 run_youtube_etl()
+text_cleaning()
+sentiment_analysis()
+
 
 
 
