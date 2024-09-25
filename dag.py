@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime
-from etl import run_youtube_etl
+from etl import youtube_data_scraping, text_cleaning, sentiment_analysis
 
 default_args = {
     'owner': 'airflow',
@@ -16,10 +16,24 @@ default_args = {
     'retry_delay': timedelta(minutes=1)
 }
 
-dag = DAG('dag', default_args=default_args, description='youtube comment etl')
+dag = DAG('dag', default_args=default_args, description='youtube comment analysis')
 
-run_etl = PythonOperator (
-    task_id = 'complete_youtube_etl',
-    python_callable = run_youtube_etl,
+youtube_data_scraping = PythonOperator (
+    task_id = 'youtube_data_scraping',
+    python_callable = youtube_data_scraping,
     dag=dag
 )
+
+text_cleaning = PythonOperator (
+    task_id = 'text_cleaning',
+    python_callable = text_cleaning,
+    dag=dag
+)
+
+sentiment_analysis = PythonOperator (
+    task_id = 'sentiment_analysis',
+    python_callable = sentiment_analysis,
+    dag=dag
+)
+
+youtube_data_scraping >> text_cleaning >> sentiment_analysis

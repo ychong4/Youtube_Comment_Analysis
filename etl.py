@@ -18,7 +18,7 @@ import pandas as pd
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 from pysentimiento import create_analyzer
 
-def run_youtube_etl():
+def youtube_data_scraping():
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -157,7 +157,7 @@ def sentiment_analysis():
     df.to_csv("comments_with_sentiment.csv", index=False)
 
 
-run_youtube_etl()
+youtube_data_scraping()
 text_cleaning()
 sentiment_analysis()
 
