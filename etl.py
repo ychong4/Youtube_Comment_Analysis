@@ -23,7 +23,7 @@ def run_youtube_etl():
     
     comments = []
     total_comments = 0
-    limit = 5000  # Set the limit to 5000 comments
+    limit = 1000  # Set the limit to 1000 comments
 
     # Loop to fetch all comments, handling pagination
     while True:
@@ -51,7 +51,7 @@ def run_youtube_etl():
             comments.append(comment_info)
             total_comments += 1
 
-            # Stop if we have reached the limit of 5000 comments
+            # Stop if we have reached the limit of 1000 comments
             if total_comments >= limit:
                 break
 
@@ -70,6 +70,7 @@ def run_youtube_etl():
     df = pd.DataFrame(comments)
     df.to_csv("comments.csv", index=False)
 
+    print(df)
     return comments
 
 
