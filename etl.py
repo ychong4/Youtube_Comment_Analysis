@@ -13,10 +13,9 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
-from transformers import pipeline
 import pandas as pd
 # Load model directly
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 from pysentimiento import create_analyzer
 
 def run_youtube_etl():
@@ -143,15 +142,13 @@ def text_cleaning():
     df.to_csv("cleaned_comments.csv")
 
 def sentiment_analysis():
-    analyzer = create_analyzer(task="sentiment", lang="en")
     pipe = pipeline("text-classification", model="finiteautomata/bertweet-base-sentiment-analysis")
-    tokenizer = AutoTokenizer.from_pretrained("finiteautomata/bertweet-base-sentiment-analysis")
-    model = AutoModelForSequenceClassification.from_pretrained("finiteautomata/bertweet-base-sentiment-analysis")
 
     def predict_sentiment(text):
         if isinstance(text, str) and len(text.strip()) > 0:
-            result = analyzer.predict(text)
-            return result.output
+            # Use the pipeline to predict sentiment
+            result = pipe(text)
+            return result[0]['label']
         else:
             return 'NEU'
     
