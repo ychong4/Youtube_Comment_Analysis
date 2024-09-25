@@ -18,22 +18,23 @@ default_args = {
 
 dag = DAG('dag', default_args=default_args, description='youtube comment analysis')
 
-youtube_data_scraping = PythonOperator (
+youtube_data_scraping_task = PythonOperator (
     task_id = 'youtube_data_scraping',
     python_callable = youtube_data_scraping,
     dag=dag
 )
 
-text_cleaning = PythonOperator (
+text_cleaning_task = PythonOperator (
     task_id = 'text_cleaning',
     python_callable = text_cleaning,
     dag=dag
 )
 
-sentiment_analysis = PythonOperator (
+sentiment_analysis_task = PythonOperator (
     task_id = 'sentiment_analysis',
     python_callable = sentiment_analysis,
     dag=dag
 )
 
-youtube_data_scraping >> text_cleaning >> sentiment_analysis
+# Setting up task dependencies
+youtube_data_scraping_task >> text_cleaning_task >> sentiment_analysis_task

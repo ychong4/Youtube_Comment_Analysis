@@ -4,6 +4,10 @@ sudo pip install apache-airflow
 sudo pip install pandas
 sudo pip install s3fs
 sudo pip install google-api-python-client
+sudo pip install pandas boto3
+sudo pip install nltk
+sudo pip install transformers
+sudo pip install pysentimiento
 
 
 -- virtual environment

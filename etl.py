@@ -80,7 +80,7 @@ def youtube_data_scraping():
 
     # Convert the comments list to a DataFrame and save to CSV
     df = pd.DataFrame(comments)
-    df.to_csv("comments.csv", index=False)
+    df.to_csv("s3://myairflowyoutubebucket/raw_data/comments.csv", index=False)
 
     return comments
 
@@ -94,7 +94,7 @@ def text_cleaning():
     stop_words = set(stopwords.words('english'))
     lemmatizer = WordNetLemmatizer()
 
-    df = pd.read_csv("comments.csv")
+    df = pd.read_csv("s3://myairflowyoutubebucket/raw_data/comments.csv")
 
     def clean_text(text):
 	    
@@ -139,7 +139,7 @@ def text_cleaning():
     df = df[df['cleaned_comment'].str.strip().astype(bool)]
 
     # Save to csv format
-    df.to_csv("cleaned_comments.csv")
+    df.to_csv("s3://myairflowyoutubebucket/cleaned_data/cleaned_comments.csv")
 
 def sentiment_analysis():
     pipe = pipeline("text-classification", model="finiteautomata/bertweet-base-sentiment-analysis")
@@ -152,9 +152,9 @@ def sentiment_analysis():
         else:
             return 'NEU'
     
-    df = pd.read_csv("cleaned_comments.csv")
+    df = pd.read_csv("s3://myairflowyoutubebucket/cleaned_data/cleaned_comments.csv")
     df['sentiment'] = df['cleaned_comment'].apply(predict_sentiment)
-    df.to_csv("comments_with_sentiment.csv", index=False)
+    df.to_csv("s3://myairflowyoutubebucket/comments_with_sentiments/comments_with_sentiment.csv", index=False)
 
 
 youtube_data_scraping()
