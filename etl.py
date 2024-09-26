@@ -144,12 +144,16 @@ def sentiment_analysis():
     pipe = pipeline("text-classification", model="finiteautomata/bertweet-base-sentiment-analysis")
 
     def predict_sentiment(text):
-        if isinstance(text, str) and len(text.strip()) > 0:
-            # Use the pipeline to predict sentiment
-            result = pipe(text)
-            return result[0]['label']
-        else:
-            return 'NEU'
+        try:
+            if isinstance(text, str) and len(text.strip()) > 0:
+                # Use the pipeline to predict sentiment
+                result = pipe(text)
+                return result[0]['label']
+            else:
+                return 'NEU'  # For neutral sentiment if the comment is empty or not valid
+        except Exception as e:
+            print(f"Error processing text: {text}. Error: {e}")
+            return 'NEU'  # Fallback to 'NEU' in case of an error
     
     df = pd.read_csv("cleaned_comments.csv")
     df['sentiment'] = df['cleaned_comment'].apply(predict_sentiment)
