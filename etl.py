@@ -146,8 +146,8 @@ def sentiment_analysis():
     def predict_sentiment(text):
         try:
             if isinstance(text, str) and len(text.strip()) > 0:
-                # Use the pipeline to predict sentiment
-                result = pipe(text)
+                # Use the pipeline to predict sentiment with truncation
+                result = pipe(text, truncation=True, max_length=128)
                 return result[0]['label']
             else:
                 return 'NEU'  # For neutral sentiment if the comment is empty or not valid
