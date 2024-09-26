@@ -8,6 +8,7 @@ sudo pip install pandas boto3
 sudo pip install nltk
 sudo pip install transformers
 sudo pip install pysentimiento
+sudo pip install torch
 
 
 -- virtual environment
