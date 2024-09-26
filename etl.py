@@ -12,6 +12,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from pysentimiento import create_analyzer
 
 import pandas as pd
 # Load model directly
@@ -141,22 +142,36 @@ def text_cleaning():
     df.to_csv("cleaned_comments.csv")
 
 def sentiment_analysis():
-    pipe = pipeline("text-classification", model="finiteautomata/bertweet-base-sentiment-analysis")
+    # Create analyzers for each task
+    sentiment_analyzer = create_analyzer(task="sentiment", lang="en")
+    emotion_analyzer = create_analyzer(task="emotion", lang="en")
+    hate_speech_analyzer = create_analyzer(task="hate_speech", lang="en")
+    irony_analyzer = create_analyzer(task="irony", lang="en")
 
-    def predict_sentiment(text):
+    def prediction(text):
         try:
             if isinstance(text, str) and len(text.strip()) > 0:
-                # Use the pipeline to predict sentiment with truncation
-                result = pipe(text, truncation=True, max_length=128)
-                return result[0]['label']
+                # Run sentiment analysis
+                sentiment_result = sentiment_analyzer.predict(text).output
+
+                # Run emotion analysis
+                emotion_result = emotion_analyzer.predict(text).output
+
+                # Run hate speech detection
+                hate_speech_result = hate_speech_analyzer.predict(text).output
+
+                # Run irony detection
+                irony_result = irony_analyzer.predict(text).output
+
+                return sentiment_result, emotion_result, hate_speech_result, irony_result
             else:
-                return 'NEU'  # For neutral sentiment if the comment is empty or not valid
+                return 'NEU', 'NONE', 'NOT_HATE', 'NOT_IRONY'
         except Exception as e:
             print(f"Error processing text: {text}. Error: {e}")
-            return 'NEU'  # Fallback to 'NEU' in case of an error
+            return 'NEU', 'NONE', 'NOT_HATE', 'NOT_IRONY'  # Fallback in case of an error
     
     df = pd.read_csv("cleaned_comments.csv")
-    df['sentiment'] = df['cleaned_comment'].apply(predict_sentiment)
+    df[['sentiment', 'emotion', 'hate_speech', 'irony']] = df['cleaned_comment'].apply(lambda text: pd.Series(prediction(text)))
     df.to_csv("comments_with_sentiment.csv", index=False)
 
 
