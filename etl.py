@@ -40,7 +40,7 @@ def youtube_data_scraping():
     while True:
         request = youtube.commentThreads().list(
             part="snippet,replies",
-            videoId='D7GDTOSNQSk',  # YouTube video ID
+            videoId='ndAQfTzlVjc',  # YouTube video ID
             pageToken=next_page_token,
             maxResults=100  # Fetch 100 comments per page
         )
