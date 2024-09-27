@@ -25,7 +25,8 @@ def youtube_data_scraping():
 
     api_service_name = "youtube"
     api_version = "v3"
-    DEVELOPER_KEY = "AIzaSyChRV4Vsu1Srvr1JUCYSBqkglXzo13GGds"
+    #DEVELOPER_KEY = "AIzaSyChRV4Vsu1Srvr1JUCYSBqkglXzo13GGds"
+    DEVELOPER_KEY = "AIzaSyA6h0C-oiRO2nLS-LzKGhK2yO3VUwW8Hzc"
     next_page_token = None
 
     # Build YouTube API service
@@ -80,7 +81,7 @@ def youtube_data_scraping():
 
     # Convert the comments list to a DataFrame and save to CSV
     df = pd.DataFrame(comments)
-    df.to_csv("s3://myairflowyoutubebucket/raw_data/comments.csv", index=False)
+    df.to_csv("comments.csv", index=False)
 
     return comments
 
@@ -94,7 +95,7 @@ def text_cleaning():
     stop_words = set(stopwords.words('english'))
     lemmatizer = WordNetLemmatizer()
 
-    df = pd.read_csv("s3://myairflowyoutubebucket/raw_data/comments.csv")
+    df = pd.read_csv("comments.csv", index_col=False)
 
     def clean_text(text):
 	    
@@ -139,14 +140,12 @@ def text_cleaning():
     df = df[df['cleaned_comment'].str.strip().astype(bool)]
 
     # Save to csv format
-    df.to_csv("s3://myairflowyoutubebucket/clean_data/cleaned_comments.csv")
+    df.to_csv("cleaned_comments.csv", index=False)
 
 def sentiment_analysis():
     # Create analyzers for each task
     sentiment_analyzer = create_analyzer(task="sentiment", lang="en")
     emotion_analyzer = create_analyzer(task="emotion", lang="en")
-    hate_speech_analyzer = create_analyzer(task="hate_speech", lang="en")
-    irony_analyzer = create_analyzer(task="irony", lang="en")
 
     def prediction(text):
         try:
@@ -157,27 +156,23 @@ def sentiment_analysis():
                 # Run emotion analysis
                 emotion_result = emotion_analyzer.predict(text).output
 
-                # Run hate speech detection
-                hate_speech_result = hate_speech_analyzer.predict(text).output
-
-                # Run irony detection
-                irony_result = irony_analyzer.predict(text).output
-
-                return sentiment_result, emotion_result, hate_speech_result, irony_result
+                return sentiment_result, emotion_result
             else:
-                return 'NEU', 'NONE', 'NOT_HATE', 'NOT_IRONY'
+                return 'NEU', 'NONE',
         except Exception as e:
             print(f"Error processing text: {text}. Error: {e}")
-            return 'NEU', 'NONE', 'NOT_HATE', 'NOT_IRONY'  # Fallback in case of an error
+            return 'NEU', 'NONE',  # Fallback in case of an error
     
-    df = pd.read_csv("s3://myairflowyoutubebucket/clean_data/cleaned_comments.csv")
-    df[['sentiment', 'emotion', 'hate_speech', 'irony']] = df['cleaned_comment'].apply(lambda text: pd.Series(prediction(text)))
-    df.to_csv("s3://myairflowyoutubebucket/comments_with_sentiments/comments_with_sentiment.csv", index=False)
+    df = pd.read_csv("cleaned_comments.csv", index_col=False)
+    df[['sentiment', 'emotion']] = df['cleaned_comment'].apply(lambda text: pd.Series(prediction(text)))
+    print(df)
+    df.to_csv("comments_with_sentiment.csv", index=False)
 
 
 
-
-
+youtube_data_scraping()
+text_cleaning()
+sentiment_analysis()
 
 
 

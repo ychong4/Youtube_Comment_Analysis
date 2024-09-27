@@ -17,4 +17,7 @@ source ~/my-venv/bin/activate
 
 -- airflow credentials
 username: admin
-password: mgXCctEXvaTwYGZM
+password: 8sfuUvk6wPbR9EU6
+
+-- secret key 
+TgOA78urbj36HZ31iOTWc4L13e5Dw+hVIQYUuYE3
